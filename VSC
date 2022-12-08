@@ -1,0 +1,80 @@
+*
+    GIT.FILENAME = 'VSC'
+    GIT.REPO= 'https://github.com/Krowemoh/vsc.git'
+*
+* Open file in VSCode
+*
+    EQU STX TO CHAR(2)
+*
+    EQU COM.START TO CHAR(27):CHAR(1)
+    EQU COM.END TO CHAR(13)
+*
+    OPEN '','VOC' TO VOC.FILE ELSE
+        PRINT 'Unable to open VOC.'
+        STOP
+    END
+*
+    COMMAND = SENTENCE()
+    CONVERT ' ' TO @AM IN COMMAND
+*
+    FOLDER = COMMAND<2>
+    FILENAME = COMMAND<3>
+*
+    READ VOC FROM VOC.FILE,FOLDER ELSE
+        PRINT 'Unable to read ' : FOLDER : ' from VOC.'
+        STOP
+    END
+*
+    IF VOC<1> = 'Q' THEN
+        FOLDER = VOC<3>
+        READ VOC FROM VOC.FILE,FOLDER ELSE
+            PRINT 'Unable to read ' : FOLDER : ' from VOC.'
+            STOP
+        END
+        FOLDER = VOC<2>
+    END
+*
+    PATH =  @PATH : '/' :  FOLDER : '/' : FILENAME 
+*
+    OPENSEQ PATH TO ANYTHING ELSE
+        PRINT 'Unable to open path: ' : PATH
+        STOP
+    END
+*
+    PATH = CHANGE(PATH,'/home/','/')
+*
+    PATH = 'Z:' : PATH
+*
+    PRINT 'Opening: ' : PATH
+    GOSUB 100
+*
+    STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+*
+    MSG = 'run "codeNoCMD", "' : PATH : '"'
+*
+    LENGTH = LEN(MSG)
+*
+    PRINT COM.START : 'global script="";host get script;execute script' : COM.END :
+*
+    PRINT STX : "BS" : MSG[1,118] : COM.END :
+*
+    IF LENGTH > 118 THEN
+        FOR POS = 119 TO LENGTH STEP 120
+            PRINT STX : MSG[POS,120] : COM.END :
+        NEXT POS
+*
+    END
+*
+    PRINT STX : COM.END :
+*
+    RETURN
+*
+* END OF PROGRAM
+*
+    END
+*
